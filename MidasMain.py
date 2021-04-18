@@ -1,7 +1,7 @@
 import math
 import os
 import sys
-
+import SelectivityCalculator
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
@@ -27,14 +27,26 @@ class MidasMain(QMainWindow, form_MidasMain):
         self.btnEProfile.setIcon(QtGui.QIcon("gui\icons\Chemdraw48.png"))
 
         #Button clicked events
-        self.btnSelectivity.setIcon(QtGui.QIcon("gui\icons\Selectivity.png"))
-        self.btnRedox.setIcon(QtGui.QIcon("gui\icons\RedoxPotential.png"))
-        self.btnSIExporter.setIcon(QtGui.QIcon("gui\icons\SI_Convertor.png"))
-        self.btnEProfile.setIcon(QtGui.QIcon("gui\icons\Chemdraw48.png"))
-
+        self.btnSelectivity.pressed.connect(self.openSelectivityCalculator)
+        self.btnRedox.pressed.connect(self.openRedoxCalculator)
+        self.btnSIExporter.pressed.connect(self.openSIExporter)
+        self.btnEProfile.pressed.connect(self.openEProfilePlotter)
 
     @pyqtSlot()
+    def openSelectivityCalculator(self):
+        print("1")
+        self.a = SelectivityCalculator.SelectivityCalculatorMainWindow()
+        self.a.show()
+        print("2")
 
+    def openRedoxCalculator(self):
+        print("2")
+
+    def openSIExporter(self):
+        print("3")
+
+    def openEProfilePlotter(self):
+        print("4")
 
 
 if __name__ == '__main__':
