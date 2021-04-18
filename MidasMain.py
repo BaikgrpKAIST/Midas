@@ -1,7 +1,7 @@
 import math
 import os
 import sys
-import SelectivityCalculator
+import SelectivityCalculator, RedoxCalculator
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
@@ -15,7 +15,7 @@ def resource_path(relative_path):
 
 form_MidasMain = uic.loadUiType(resource_path("gui/MidasMain.ui"))[0]
 
-class MidasMain(QMainWindow, form_MidasMain):
+class MidasMainWindow(QMainWindow, form_MidasMain):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -34,13 +34,12 @@ class MidasMain(QMainWindow, form_MidasMain):
 
     @pyqtSlot()
     def openSelectivityCalculator(self):
-        print("1")
         self.a = SelectivityCalculator.SelectivityCalculatorMainWindow()
         self.a.show()
-        print("2")
 
     def openRedoxCalculator(self):
-        print("2")
+        self.a = RedoxCalculator.RedoxCalculatorMainWindow()
+        self.a.show()
 
     def openSIExporter(self):
         print("3")
@@ -51,6 +50,6 @@ class MidasMain(QMainWindow, form_MidasMain):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    w = MidasMain()
+    w = MidasMainWindow()
     w.show()
     app.exec()
