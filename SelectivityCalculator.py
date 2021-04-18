@@ -4,6 +4,7 @@ import sys
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 def resource_path(relative_path):
@@ -32,6 +33,8 @@ class SelectivityCalculatorMainWindow(QMainWindow, form_class):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        #Setup icon
+        self.setWindowIcon(QIcon('gui\icons\Selectivity.png'))
 
         self.btnCalculate.pressed.connect(self.btnCalculateClicked)
         self.btnClear.pressed.connect(self.btnClearClicked)

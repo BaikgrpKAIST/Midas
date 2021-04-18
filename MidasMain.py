@@ -1,7 +1,7 @@
 import math
 import os
 import sys
-import SelectivityCalculator, RedoxCalculator
+import SelectivityCalculator, RedoxCalculator, SIExporter
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
@@ -42,7 +42,8 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.a.show()
 
     def openSIExporter(self):
-        print("3")
+        self.a = SIExporter.SIExporterMainWindow()
+        self.a.show()
 
     def openEProfilePlotter(self):
         print("4")
