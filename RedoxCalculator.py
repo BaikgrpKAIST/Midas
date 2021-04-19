@@ -20,7 +20,7 @@ class RedoxCalculatorMainWindow(QMainWindow, form_class):
         super().__init__()
         self.setupUi(self)
         #Setup icon
-        self.setWindowIcon(QIcon('gui\icons\RedoxPotential.png'))
+        self.setWindowIcon(QIcon(resource_path('gui\icons\RedoxPotential.png')))
 
         self.btnCalculate.pressed.connect(self.btnCalculateClicked)
         self.btnClear.pressed.connect(self.btnClearClicked)

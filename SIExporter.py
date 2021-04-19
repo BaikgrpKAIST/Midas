@@ -25,7 +25,7 @@ class SIExporterMainWindow(QMainWindow, form_class):
         super().__init__()
         self.setupUi(self)
         # Setup icon
-        self.setWindowIcon(QIcon('gui\icons\SI_Convertor.png'))
+        self.setWindowIcon(QIcon(resource_path('gui\icons\SI_Convertor.png')))
 
         self.btnPath.pressed.connect(self.btnPathClicked)
         self.btnConvert.pressed.connect(self.btnConvertClicked)
@@ -51,7 +51,18 @@ class SIExporterMainWindow(QMainWindow, form_class):
                 if not (os.path.isdir(Path(freqPath).parent)):
                     os.makedirs(Path(freqPath).parent)
 
+                self.progressBar.setValue(0)
+                steps = len(toConvert)
+                current_step = 0
+                error_list = []
+
                 for list in toConvert:
+                    current_step += 1
+
+                    if list.strip() == "":
+                        self.progressBar.setValue(int(100 * (current_step / steps)))
+                        continue
+
                     CalcPath = ""
                     if (os.path.isdir(rootPath + "/" + list.split()[0])):
                         CalcPath = rootPath + "/" + list.split()[0]
@@ -60,6 +71,8 @@ class SIExporterMainWindow(QMainWindow, form_class):
                             CalcPath = rootPath
                         else:
                             QMessageBox.question(self, "Error", "Your calculation "+rootPath+"/"+list.split()[0]+".out does not exist!", QMessageBox.Ok)
+                            error_list.append(list.split()[0])
+                            continue
                     program_used = get_program(CalcPath, list.split()[0])
 
                     if program_used == "Jaguar":
@@ -74,6 +87,19 @@ class SIExporterMainWindow(QMainWindow, form_class):
                         QMessageBox.question(self, "Notice",
                                              "Your calculation ID " + list.split[0] + "cannot be classified.",
                                              QMessageBox.Ok)
+
+                    self.progressBar.setValue(int(100 * (current_step/steps)))
+
+                QMessageBox.question(self, "Notice", "Finished Exportation!", QMessageBox.Ok)
+                if len(error_list) > 0:
+                    error_message = "Following calculation(s) did not exported:\n"
+                    for i in range(len(error_list)):
+                        error_message = error_message + error_list[i] + "\n"
+                    QMessageBox.question(self, "Error", error_message, QMessageBox.Ok)
+
+                os.startfile(Path(coordPath).parent)
+                if coordPath != freqPath:
+                    os.startfile(Path(freqPath).parent)
 
         except:
             QMessageBox.question(self, "Notice", "Please enter root path, filenames and labels properly!",
@@ -336,6 +362,9 @@ def SI_ORCA(CalcPath, list, coordPath, freqPath):
             outFile.readline()
             outFile.readline()
             line = outFile.readline().strip()
+            if "Scaling factor" in line:
+                outFile.readline()
+                line = outFile.readline().strip()
             while line.strip() != "":
                 freq_count += 1
                 freq = freq + "%8s" % line.strip().split()[1]
@@ -371,8 +400,3 @@ def SI_ORCA(CalcPath, list, coordPath, freqPath):
     freq_txt.close()
     outFile.close()
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    w = SIExporterMainWindow()
-    w.show()
-    app.exec()

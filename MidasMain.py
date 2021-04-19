@@ -5,7 +5,7 @@ import SelectivityCalculator, RedoxCalculator, SIExporter
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5.QtGui import QIcon
 
 
@@ -21,10 +21,10 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.setupUi(self)
 
         #Setup icons
-        self.btnSelectivity.setIcon(QIcon("gui\icons\Selectivity.png"))
-        self.btnRedox.setIcon(QIcon("gui\icons\RedoxPotential.png"))
-        self.btnSIExporter.setIcon(QIcon("gui\icons\SI_Convertor.png"))
-        self.btnEProfile.setIcon(QIcon("gui\icons\Chemdraw48.png"))
+        self.btnSelectivity.setIcon(QIcon(resource_path("gui\icons\Selectivity.png")))
+        self.btnRedox.setIcon(QIcon(resource_path("gui\icons\RedoxPotential.png")))
+        self.btnSIExporter.setIcon(QIcon(resource_path("gui\icons\SI_Convertor.png")))
+        self.btnEProfile.setIcon(QIcon(resource_path("gui\icons\Chemdraw48.png")))
 
         #Button clicked events
         self.btnSelectivity.pressed.connect(self.openSelectivityCalculator)
@@ -46,7 +46,7 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.a.show()
 
     def openEProfilePlotter(self):
-        print("4")
+        QMessageBox.question(self, "Notice", "Not yet supported!", QMessageBox.Ok)
 
 
 if __name__ == '__main__':
