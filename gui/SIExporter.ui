@@ -63,7 +63,7 @@ p, li { white-space: pre-wrap; }
      </widget>
     </item>
     <item>
-     <widget class="QTextEdit" name="txtAreatoConvert"/>
+     <widget class="QPlainTextEdit" name="txtAreatoConvert"/>
     </item>
     <item>
      <widget class="QGroupBox" name="groupBox_2">

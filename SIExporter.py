@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import PeriodicTable
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
@@ -55,7 +56,7 @@ class SIExporterMainWindow(QMainWindow, form_class):
                     if (os.path.isdir(rootPath + "/" + list.split()[0])):
                         CalcPath = rootPath + "/" + list.split()[0]
                     else:
-                        if(os.path.isfile(rootPath+"/"+list.split()[0]+".out")):
+                        if(os.path.isfile(rootPath+"/"+list.split()[0]+".out") or os.path.isfile(rootPath+"/"+list.split()[0]+".log")):
                             CalcPath = rootPath
                         else:
                             QMessageBox.question(self, "Error", "Your calculation "+rootPath+"/"+list.split()[0]+".out does not exist!", QMessageBox.Ok)
@@ -81,7 +82,15 @@ class SIExporterMainWindow(QMainWindow, form_class):
 
 def get_program(CalcPath, outname):
     outpath = CalcPath + "/" + outname + ".out"
-    outFile = open(outpath, 'r')
+    logpath = CalcPath + "/" + outname + ".log"
+
+    #open outfile. If not, read logfile.
+    outFile = None
+    if os.path.isfile(outpath):
+        outFile = open(outpath, 'r')
+    elif os.path.isfile(logpath):
+        outFile = open(logpath, 'r')
+
     line = ""
     program_determined = False
     program = ""
@@ -91,7 +100,7 @@ def get_program(CalcPath, outname):
             program = "Jaguar"
             program_determined = True
             break
-        elif "Q-Chem version" in line:
+        elif "Q-Chem" in line:
             program = "Qchem"
             program_determined = True
             break
@@ -121,21 +130,27 @@ def SI_Jaguar(CalcPath, list, coordPath, freqPath):
     coord_txt.write("===============================\n"+label+"\n===============================\n")
     freq_txt.write("===============================\n"+label+"\n===============================\n")
 
-    line = ""
+    frequencies = ""
+    coordinates = ""
+    numatom = 0
+
     while True:
         line = outFile.readline()
         if not line: break
 
+        #get freqencies
         if line.startswith("  frequencies"):
-            line = line.strip()
             freq = ""
+            line = line.strip()
             for i in range(len(line.split()) - 1):
                 freq = freq + "%8s" % line.split()[i+1]
-            freq_txt.write(freq+"\n")
+            frequencies = frequencies + freq + "\n"
 
-        elif line.startswith(" Input geometry:"):
+        #get coordinates
+        elif line.startswith(" Input geometry:") or line.startswith("  final geometry:") or line.startswith("  new geometry:"):
             coordinates = ""
             numatom = 0
+
             outFile.readline()
             outFile.readline()
             line = outFile.readline().strip()
@@ -146,10 +161,13 @@ def SI_Jaguar(CalcPath, list, coordPath, freqPath):
                     coord = coord + ("%14.9f"% float(line.strip().split()[i+1]))
                 line = outFile.readline()
                 coordinates = coordinates + coord + "\n"
-            coord_txt.write(coordinates + "\n")
-            coord_xyz.write(str(numatom)+"\n")
-            coord_xyz.write(label+"\n")
-            coord_xyz.write(coordinates)
+
+    #write files
+    freq_txt.write(frequencies+"\n")
+    coord_txt.write(coordinates + "\n")
+    coord_xyz.write(str(numatom)+"\n")
+    coord_xyz.write(label+"\n")
+    coord_xyz.write(coordinates)
 
     coord_txt.close()
     coord_xyz.close()
@@ -169,16 +187,68 @@ def SI_Qchem(CalcPath, list, coordPath, freqPath):
     coord_txt.write("===============================\n"+label+"\n===============================\n")
     freq_txt.write("===============================\n"+label+"\n===============================\n")
 
+    frequencies = ""
+    coordinates = ""
+    numatom = 0
+    freq_count = 0
+
+    while True:
+        line = outFile.readline()
+        if not line: break
+
+        #get freqencies
+        if "Frequency:" in line:
+            freq_count += 1
+            freq = ""
+            line = line.strip()
+            for i in range(len(line.split()) - 1):
+                freq = freq + "%8s" % line.split()[i+1]
+
+            frequencies = frequencies + freq
+            if freq_count%2 == 0 : frequencies = frequencies + "\n"
+
+        #get coordinates
+        elif "Standard Nuclear Orientation (Angstroms)" in line:
+            coordinates = ""
+            numatom = 0
+
+            outFile.readline()
+            outFile.readline()
+            line = outFile.readline().strip()
+            while not ("----------" in line):
+                numatom += 1
+                coord = "%4s" % re.sub('[0-9]+', '', line.strip().split()[1])
+                for i in range(len(line.strip().split()) - 2):
+                    coord = coord + ("%14.9f"% float(line.strip().split()[i+2]))
+                line = outFile.readline()
+                coordinates = coordinates + coord + "\n"
+
+    #write files
+    freq_txt.write(frequencies+"\n")
+    coord_txt.write(coordinates + "\n")
+    coord_xyz.write(str(numatom)+"\n")
+    coord_xyz.write(label+"\n")
+    coord_xyz.write(coordinates)
+
     coord_txt.close()
     coord_xyz.close()
     freq_txt.close()
     outFile.close()
 
 
+
 def SI_Gaussian(CalcPath, list, coordPath, freqPath):
     CalcID = list.split()[0]
     outpath = CalcPath + "/" + CalcID + ".out"
-    outFile = open(outpath, 'r')
+    logpath = CalcPath + "/" + CalcID + ".log"
+
+    #open outfile. If not, read logfile.
+    outFile = None
+    if os.path.isfile(outpath):
+        outFile = open(outpath, 'r')
+    elif os.path.isfile(logpath):
+        outFile = open(logpath, 'r')
+
     label = list.split()[1]
     coord_txt = open(coordPath, 'a')
     coord_xyz = open(coordPath.replace('.txt', '.xyz'), 'a')
@@ -186,6 +256,52 @@ def SI_Gaussian(CalcPath, list, coordPath, freqPath):
 
     coord_txt.write("===============================\n"+label+"\n===============================\n")
     freq_txt.write("===============================\n"+label+"\n===============================\n")
+
+    frequencies = ""
+    coordinates = ""
+    numatom = 0
+    freq_count = 0
+
+    while True:
+        line = outFile.readline()
+        if not line: break
+
+        #get freqencies
+        if "Frequencies --" in line:
+            freq_count += 1
+            freq = ""
+            line = line.strip()
+            for i in range(len(line.split()) - 2):
+                freq = freq + "%8s" % str(format(float(line.split()[i+2]),".2f"))
+
+            frequencies = frequencies + freq
+            if freq_count%2 == 0 : frequencies = frequencies + "\n"
+
+        #get coordinates
+        elif "Input orientation:" in line:
+            coordinates = ""
+            numatom = 0
+
+            outFile.readline()
+            outFile.readline()
+            outFile.readline()
+            outFile.readline()
+            line = outFile.readline().strip()
+            while not ("----------" in line.strip()):
+                numatom += 1
+                atom = PeriodicTable.getAtom(line.strip().split()[1])
+                coord = "%4s" % atom
+                for i in range(len(line.strip().split()) - 3):
+                    coord = coord + ("%14.6f"% float(line.strip().split()[i+3]))
+                line = outFile.readline()
+                coordinates = coordinates + coord + "\n"
+
+    #write files
+    freq_txt.write(frequencies+"\n")
+    coord_txt.write(coordinates + "\n")
+    coord_xyz.write(str(numatom)+"\n")
+    coord_xyz.write(label+"\n")
+    coord_xyz.write(coordinates)
 
     coord_txt.close()
     coord_xyz.close()
@@ -205,11 +321,55 @@ def SI_ORCA(CalcPath, list, coordPath, freqPath):
     coord_txt.write("===============================\n"+label+"\n===============================\n")
     freq_txt.write("===============================\n"+label+"\n===============================\n")
 
+    frequencies = ""
+    coordinates = ""
+    numatom = 0
+    freq_count = 0
+
+    while True:
+        line = outFile.readline()
+        if not line: break
+
+        #get freqencies
+        if "VIBRATIONAL FREQUENCIES" in line:
+            freq = ""
+            outFile.readline()
+            outFile.readline()
+            line = outFile.readline().strip()
+            while line.strip() != "":
+                freq_count += 1
+                freq = freq + "%8s" % line.strip().split()[1]
+                if freq_count % 6 == 0: freq = freq + "\n"
+                line = outFile.readline()
+
+            frequencies = frequencies + freq
+
+        #get coordinates
+        elif "CARTESIAN COORDINATES (ANGSTROEM)" in line:
+            coordinates = ""
+            numatom = 0
+
+            outFile.readline()
+            line = outFile.readline().strip()
+            while line.strip() != "":
+                numatom += 1
+                coord = "%4s" % re.sub('[0-9]+', '', line.strip().split()[0])
+                for i in range(len(line.strip().split())-1):
+                    coord = coord + ("%14.6f"% float(line.strip().split()[i+1]))
+                line = outFile.readline()
+                coordinates = coordinates + coord + "\n"
+
+    #write files
+    freq_txt.write(frequencies+"\n")
+    coord_txt.write(coordinates + "\n")
+    coord_xyz.write(str(numatom)+"\n")
+    coord_xyz.write(label+"\n")
+    coord_xyz.write(coordinates)
+
     coord_txt.close()
     coord_xyz.close()
     freq_txt.close()
     outFile.close()
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

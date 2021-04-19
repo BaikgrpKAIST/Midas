@@ -6,7 +6,7 @@ import SelectivityCalculator, RedoxCalculator, SIExporter
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from qtconsole.qt import QtGui
+from PyQt5.QtGui import QIcon
 
 
 def resource_path(relative_path):
@@ -21,10 +21,10 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.setupUi(self)
 
         #Setup icons
-        self.btnSelectivity.setIcon(QtGui.QIcon("gui\icons\Selectivity.png"))
-        self.btnRedox.setIcon(QtGui.QIcon("gui\icons\RedoxPotential.png"))
-        self.btnSIExporter.setIcon(QtGui.QIcon("gui\icons\SI_Convertor.png"))
-        self.btnEProfile.setIcon(QtGui.QIcon("gui\icons\Chemdraw48.png"))
+        self.btnSelectivity.setIcon(QIcon("gui\icons\Selectivity.png"))
+        self.btnRedox.setIcon(QIcon("gui\icons\RedoxPotential.png"))
+        self.btnSIExporter.setIcon(QIcon("gui\icons\SI_Convertor.png"))
+        self.btnEProfile.setIcon(QIcon("gui\icons\Chemdraw48.png"))
 
         #Button clicked events
         self.btnSelectivity.pressed.connect(self.openSelectivityCalculator)
