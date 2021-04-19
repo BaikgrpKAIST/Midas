@@ -38,7 +38,7 @@ class SIExporterMainWindow(QMainWindow, form_class):
     def btnConvertClicked(self):
         try:
             if (not self.txtRootPath.text()) or (not os.path.isdir(self.txtRootPath.text())):
-                QMessageBox.question(self, "Notice", "Please enter root path properly!", QMessageBox.Ok)
+                QMessageBox.information(self, "Notice", "Please enter root path properly!", QMessageBox.Ok)
 
             else:
                 toConvert = self.txtAreatoConvert.toPlainText().split("\n")
@@ -70,7 +70,7 @@ class SIExporterMainWindow(QMainWindow, form_class):
                         if(os.path.isfile(rootPath+"/"+list.split()[0]+".out") or os.path.isfile(rootPath+"/"+list.split()[0]+".log")):
                             CalcPath = rootPath
                         else:
-                            QMessageBox.question(self, "Error", "Your calculation "+rootPath+"/"+list.split()[0]+".out does not exist!", QMessageBox.Ok)
+                            QMessageBox.information(self, "Error", "Your calculation "+rootPath+"/"+list.split()[0]+".out does not exist!", QMessageBox.Ok)
                             error_list.append(list.split()[0])
                             continue
                     program_used = get_program(CalcPath, list.split()[0])
@@ -84,25 +84,25 @@ class SIExporterMainWindow(QMainWindow, form_class):
                     elif program_used == "orca":
                         SI_ORCA(CalcPath, list, coordPath, freqPath)
                     else:
-                        QMessageBox.question(self, "Notice",
+                        QMessageBox.information(self, "Notice",
                                              "Your calculation ID " + list.split[0] + "cannot be classified.",
                                              QMessageBox.Ok)
 
                     self.progressBar.setValue(int(100 * (current_step/steps)))
 
-                QMessageBox.question(self, "Notice", "Finished Exportation!", QMessageBox.Ok)
+                QMessageBox.information(self, "Notice", "Finished Exportation!", QMessageBox.Ok)
                 if len(error_list) > 0:
                     error_message = "Following calculation(s) did not exported:\n"
                     for i in range(len(error_list)):
                         error_message = error_message + error_list[i] + "\n"
-                    QMessageBox.question(self, "Error", error_message, QMessageBox.Ok)
+                    QMessageBox.information(self, "Error", error_message, QMessageBox.Ok)
 
                 os.startfile(Path(coordPath).parent)
                 if coordPath != freqPath:
                     os.startfile(Path(freqPath).parent)
 
         except:
-            QMessageBox.question(self, "Notice", "Please enter root path, filenames and labels properly!",
+            QMessageBox.information(self, "Notice", "Please enter root path, filenames and labels properly!",
                                  QMessageBox.Ok)
 
 

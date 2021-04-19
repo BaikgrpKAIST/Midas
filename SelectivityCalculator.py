@@ -54,7 +54,7 @@ class SelectivityCalculatorMainWindow(QMainWindow, form_class):
             self.txtEnergy.setText(computed_energy)
 
         else:
-            QMessageBox.question(self, "Notice", "Please enter energy or selectivity value.", QMessageBox.Ok)
+            QMessageBox.information(self, "Notice", "Please enter energy or selectivity value.", QMessageBox.Ok)
 
     def btnClearClicked(self):
         self.txtEnergy.setText("")

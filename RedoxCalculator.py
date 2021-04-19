@@ -38,14 +38,14 @@ class RedoxCalculatorMainWindow(QMainWindow, form_class):
                 SHE = 4.43
 
             if G_sol > 0:
-                QMessageBox.question(self, "Notice", "G(Sol) for A should be larger than G(Sol) for A(-1).", QMessageBox.Ok)
+                QMessageBox.information(self, "Notice", "G(Sol) for A should be larger than G(Sol) for A(-1).", QMessageBox.Ok)
             else:
                 Correction = float(self.comboRefElectrode.currentText().split()[3])
                 RedPot = (-1*G_sol) - SHE - Correction
                 self.txtRedoxPot.setText(str(round(RedPot,2)))
 
         except:
-            QMessageBox.question(self, "Notice", "Please enter proper values.", QMessageBox.Ok)
+            QMessageBox.information(self, "Notice", "Please enter proper values.", QMessageBox.Ok)
 
     def btnClearClicked(self):
         self.txtEnergy1.setText("")

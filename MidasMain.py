@@ -46,7 +46,7 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.a.show()
 
     def openEProfilePlotter(self):
-        QMessageBox.question(self, "Notice", "Not yet supported!", QMessageBox.Ok)
+        QMessageBox.information(self, "Notice", "Not yet supported!", QMessageBox.Ok)
 
 
 if __name__ == '__main__':
