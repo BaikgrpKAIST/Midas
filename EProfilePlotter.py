@@ -77,18 +77,149 @@ class EProfilePlotterMainWindow(QMainWindow, form_class):
         for line in toConvert:
             colortable.append(line.split("]")[1].split()[1])
 
-        initialize_file(filePath, colortable)
+        #Initiate cdxml_file & write header
+        writing_file(filePath, header(1,1, colortable), "w")
 
+        y_size_list = 0.0
         #Write cdxml file
         for line in toConvert:
-            curr_energy = line.split("]")[0].split("[")[1]
-            width = line.split("]")[1].split()[3]
-            curve = line.split("]")[1].split()[2]
-            font_size = line.split()[1]
+            try:
+                curr_energy = list(map(float, line.split("]")[0].split("[")[1].split()))
+                width = line.split("]")[1].split()[3]
+                curve = line.split("]")[1].split()[2]
+                font_size = int(line.split("]")[1].split()[0])
+                rel_dx = float(width)
+                rel_curv = float(curve) / 4
+                #generate_curve(filePath, curr_energy, width, curve, colortable, font_size)
 
-            generate_curve(filePath, curr_energy, width, curve, colortable, font_size)
+                # starting point
+                max_val, min_val = max(curr_energy), min(curr_energy)
+                starting_point = [70, 50 + ((max_val - curr_energy[0] + y_size_list) * 5) + y_size_list]
+                y_size_list += (max_val - min_val) + 10
 
-        finalize_file(filePath)
+                # setting for pages
+                #if (len(curr_energy) - 1) * 20 * rel_dx > 440: page_W = 2
+                #if diff_val * 5 + 70 > 750: page_H = 2
+
+                #make labels
+                curr_labels = []
+                for i in range(len(curr_energy)):
+                    if i % 2 == 0:
+                        temp_lb = "%d" % (i // 2 + 1)
+                    else:
+                        temp_lb = "%d-TS" % (i // 2 + 1)
+                    curr_labels.append(temp_lb)
+
+                points_Eprofile = make_points_Eprofile(curr_energy, starting_point, rel_dx)
+                curve_points = make_curve_points(points_Eprofile, rel_curv)
+                make_dots(filePath, points_Eprofile)
+                make_curve(filePath, curve_points)
+                make_labels(filePath, curr_energy, curr_labels, points_Eprofile, font_size)
+
+            except:
+                continue
+
+        #Close file
+        writing_file(filePath, "</page></CDXML>", "a")
+
+def writing_file(filePath, contents, type):
+    f = open(filePath, type)
+    f.write(contents)
+    f.close()
+
+def header(page_H, page_W, colortable):
+    #Header
+    header_setup = '<?xml version="1.0" encoding="UTF-8" ?>\n' \
+            '<!DOCTYPE CDXML SYSTEM "http://www.cambridgesoft.com/xml/cdxml.dtd" >\n' \
+            '<CDXML\n' \
+            '><fonttable>\n' \
+            '<font id="3" charset="iso-8859-1" name="Arial"/>\n' \
+            '<font id="7" charset="Unknown" name="Symbol"/>\n' \
+            '</fonttable>\n'
+
+    #Color setup
+    color_setup = '<colortable>\n' \
+            '<color r=\"1\" g=\"1\" b=\"1\"/>\n' \
+            '<color r=\"0\" g=\"0\" b=\"0\"/>\n'
+
+    for color in colortable:
+        col = QColor(color)
+        col_r = int(col.getRgb()[0])
+        col_g = int(col.getRgb()[1])
+        col_b = int(col.getRgb()[2])
+        color_setup += "<color r=\"" + str(round(col_r / 255, 2)) + "\" g=\"" + str(round(col_g / 255,2)) + "\" b=\"" + str(round(col_b / 255, 2)) + "\"/>\n"
+
+    color_setup += "</colortable>"
+
+    #Page setup
+    page_setup = '<page\n' \
+            'id="6"\n ' \
+            'BoundingBox="0 0 523.20 769.68"\n ' \
+            'HeaderPosition="36"\n ' \
+            'FooterPosition="36"\n ' \
+            'PrintTrimMarks="yes"\n ' \
+            'HeightPages="{0}"\n ' \
+            'WidthPages="{1}"\n>\n'.format(page_H, page_W)
+
+    Arrow = "<arrow\n" + " id=\"13\"\n" + " BoundingBox=\"13.87 13.84 18.63 60\"\n" + " Z=\"6\"\n" + " LineWidth=\"0.85\"\n" + " FillType=\"None\"\n" + " ArrowheadHead=\"Full\"\n" + " ArrowheadType=\"Solid\"\n" + " HeadSize=\"1000\"\n" + " ArrowheadCenterSize=\"875\"\n" + " ArrowheadWidth=\"250\"\n" + " Head3D=\"16.50 13.84 0\"\n" + " Tail3D=\"16.50 64 0\"\n" + " Center3D=\"21.75 45.59 0\"\n" + " MajorAxisEnd3D=\"71.91 45.59 0\"\n" + " MinorAxisEnd3D=\"21.75 95.75 0\"\n" + "/>"
+
+    G_sol = "<t\n" + " id=\"11\"\n" + " p=\"40.50 24.50\"\n" + " BoundingBox=\"20.99 15.45 60.01 37.65\"\n" + " Z=\"7\"\n" + " CaptionJustification=\"Center\"\n" + " Justification=\"Center\"\n" + " LineHeight=\"auto\"\n" + " LineStarts=\"8 18\"\n" + "><s font=\"7\" size=\"9\" color=\"0\" face=\"1\">D</s><s font=\"3\" size=\"9\" color=\"0\" face=\"1\">G(sol)\n" + "</s><s font=\"3\" size=\"9\" color=\"0\">(kcal/mol)</s></t>"
+
+
+    general_info = header_setup + color_setup + page_setup + Arrow + G_sol
+    return general_info
+
+
+def make_points_Eprofile(values, starting_point, rel_dx):
+    ref_x, ref_y = starting_point[0], starting_point[1]
+    points_Eprofile = []
+    inc_x, inc_y = 0, 0
+    for i in range(len(values)):
+        points_Eprofile.append([ref_x + inc_x, ref_y - inc_y * 5])
+        inc_x += 30 * rel_dx
+        if i < len(values) - 1: inc_y = values[i + 1] - values[0]
+    return points_Eprofile
+
+def make_curve_points(points_Eprofile, rel_curv):
+    curve_points = []
+    for xy in points_Eprofile:
+        curve_points = curve_points + [xy[0] - 15 * rel_curv, xy[1], xy[0], xy[1], xy[0] + 15 * rel_curv, xy[1]]
+    return " ".join(str(item) for item in curve_points)
+
+def make_curve(filename, curve_points):
+    f = open(filename, "a")
+    f.write('<curve\n id="4"\n Z="1"\n ArrowheadType="Solid"\n CurvePoints="%s"\n/>\n' % (curve_points))
+    f.close()
+
+def make_dots(filename, points_Eprofile):
+    f = open(filename, "a")
+    for xy in points_Eprofile:
+        f.write('<graphic\n BoundingBox="%s %s %s %s"\n GraphicType="Symbol"\n SymbolType="Electron"\n/>\n' % (
+        xy[0], xy[1], xy[0], xy[1] + 15))
+    f.close()
+
+def make_labels(filename, values, labels, points_Eprofile, font_size):
+    f = open(filename, "a")
+    if font_size > 9:
+        alpha = font_size / 4
+    else:
+        alpha = 0
+    for i, xy in enumerate(points_Eprofile):
+        if re.search("TS", labels[i]):
+            y_inc = -13.5 - alpha
+        else:
+            y_inc = 12 + alpha
+        f.write('<t\n p="%s %s"\n CaptionJustification="Center"\n Justification="Center"\n LineHeight="auto"\n>' % (
+        xy[0], xy[1] + y_inc))
+        f.write('<s font="3" size="{0}" color="0" face="1">{1}\n</s>'.format(font_size, labels[i]))
+        if float(values[i]) < 0:  # make en-dash
+            num = str(values[i]).split("-")[1]
+            f.write('<s font="3" size="{0}" color="0">(</s>'.format(font_size))
+            f.write('<s font="7" size="{0}" color="0">-</s><s font="3" size="{1}" color="0">{2:0.2f})</s></t>\n'.format(font_size,font_size,float(num)))
+        else:
+            f.write('<s font="3" size="{0}" color="0">({1:0.2f})</s></t>\n'.format(font_size, float(values[i])))
+    f.close()
+
 
 def initialize_file(filePath, colortable):
     cdxml_file = open(filePath, 'w')
@@ -127,88 +258,6 @@ def initialize_file(filePath, colortable):
     cdxml_file.write(Arrow)
     cdxml_file.write(G_sol)
 
-    cdxml_file.close()
-
-def generate_curve(filePath, curr_energy, width, curve, colortable, font_size):
-    cdxml_file = open(filePath, 'a')
-
-    energy_arr = curr_energy.split()
-    firstitem = float(energy_arr[0])
-
-    inc_x = 0
-    inc_y = 0
-    start_x = 50
-    start_y = 50 # + size
-    horizontal = 212.8
-    vertical = 770
-    maxen = 0.0
-    minen = 0.0
-    curvature = float(curve)
-
-    for item in energy_arr:
-        if float(item) > maxen:
-            maxen = float(item)
-        if float(item) < minen:
-            minen = float(item)
-
-    x_spacing = float(horizontal/(len(energy_arr)))
-    y_spacing = 5
-
-    if (int(maxen) - int(minen)) > 100:
-        y_spacing = 500/(int(maxen) - int(minen))
-
-    points_list_x = []
-    points_list_y = []
-
-    for item in energy_arr:
-        inc_y = float(item) - firstitem
-        points_list_x.append(start_x + inc_x)
-        points_list_y.append(start_y - inc_y * y_spacing)
-        inc_x += x_spacing
-
-    # Make the sequence for drawing the curves //
-    curvepoints = ""
-    minval = min(points_list_y)
-    maxval = max(points_list_y)
-    y_shift = points_list_y[0] - minval
-    fix_y = float(font_size) + 3.0
-
-    for i in range(len(points_list_x)):
-        curvepoints = curvepoints + (" %.2f" % (points_list_x[i] - 3 * curvature)) + (" %.2f" % (points_list_y[i] + y_shift))
-        curvepoints = curvepoints + (" %.2f" % points_list_x[i]) + (" %.2f" % (points_list_y[i] + y_shift))
-        curvepoints = curvepoints + (" %.2f" % (points_list_x[i] + 3 * curvature)) + (" %.2f" % (points_list_y[i] + y_shift))
-        dot = "<graphic\n BoundingBox=\"" + ("%.2f"% points_list_x[i]) + (" %.2f" % (points_list_y[i] + y_shift)) + " "
-        dot = dot + ("%.2f" % points_list_x[i]) + (" %.2f" % (points_list_y[i] + 15 + y_shift)) + "\"\n color=\"4\"\n GraphicType=\"Symbol\"\n SymbolType=\"Electron\"\n/>\n"
-        cdxml_file.write(dot)
-
-        label_before = "<t\n" + " id=\"18\"\n" + " p=\"" + ("%.2f" % points_list_x[i]) + (" %.2f" % (points_list_y[i] + y_shift + fix_y)) + "\"\n" + " BoundingBox=\"" + ("%.2f" % points_list_x[i]) + (" %.2f" % (points_list_y[i] + y_shift)) + (" %.2f" % (points_list_x[i] + 25)) + (" %.2f" % (points_list_y[i] + 24 + y_shift)) + "\"\n" + " Z=\"13\"\n color=\"4\"\n" + " Warning=\"Chemical Interpretation is not possible for this label\"\n" + " CaptionJustification=\"Center\"\n" + " Justification=\"Center\"\n" + " LineHeight=\"auto\"\n" + " LineStarts=\"5 11\"\n" + "><s font=\"3\" size=\"" + font_size + "\" color=\"4\" face=\"1\">"
-        label_middle = "</s><s font=\"4\" size=\"" + font_size + "\" color=\"4\">"
-        label_end = "</s></t>"
-
-        if (i % 2 == 0): # for intermediate
-            label = str(int((i + 2) / 2))
-            cdxml_file.write(label_before + label + "\n")
-            energyval = "%.02f" % float(energy_arr[i])
-            cdxml_file.write(label_middle + "(" + energyval + ")") # minus to en dash
-            cdxml_file.write(label_end)
-            fix_y = -1 * float(font_size) - 6
-
-        else: # for TS
-            label = str(int((i + 1) / 2)) + "-TS"
-            cdxml_file.write(label_before + label + "\n")
-            energyval = "%.02f" % float(energy_arr[i])
-            cdxml_file.write(label_middle + "(" + energyval + ")")
-            cdxml_file.write(label_end)
-            fix_y = float(font_size) + 3
-
-    cdxml_file.write("<curve\n id=\"4\"\n Z=\"1\"\n color=\"4\"\n LineWidth=\"" + width + "\"\n ArrowheadType=\"Solid\"\n CurvePoints=\"" + curvepoints)
-    cdxml_file.write("\"\n/>\n")
-
-    cdxml_file.close()
-
-def finalize_file(filePath):
-    cdxml_file = open(filePath, 'a')
-    cdxml_file.write("</page></CDXML>")
     cdxml_file.close()
 
 if __name__ == '__main__':
