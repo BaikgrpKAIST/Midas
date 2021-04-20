@@ -1,7 +1,7 @@
 import math
 import os
 import sys
-import SelectivityCalculator, RedoxCalculator, SIExporter
+import SelectivityCalculator, RedoxCalculator, SIExporter, EProfilePlotter
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
@@ -19,6 +19,7 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.statusBar.showMessage("Copyright(C) 2021. Baikgroup @ KAIST. All rights reserved.")
 
         #Setup icons
         self.btnSelectivity.setIcon(QIcon(resource_path("gui\icons\Selectivity.png")))
@@ -46,7 +47,8 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.a.show()
 
     def openEProfilePlotter(self):
-        QMessageBox.information(self, "Notice", "Not yet supported!", QMessageBox.Ok)
+        self.a = EProfilePlotter.EProfilePlotterMainWindow()
+        self.a.show()
 
 
 if __name__ == '__main__':

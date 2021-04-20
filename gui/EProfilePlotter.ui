@@ -324,8 +324,8 @@ p, li { white-space: pre-wrap; }
        <item row="2" column="3">
         <widget class="QPushButton" name="btnColor">
          <property name="styleSheet">
-          <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 0, 0);</string>
+          <string notr="true">QWidget{color:#ffffff;
+background-color: #000000;}</string>
          </property>
          <property name="text">
           <string>Color</string>
