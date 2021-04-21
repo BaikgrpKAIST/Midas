@@ -164,6 +164,8 @@ class EProfilePlotterMainWindow(QMainWindow, form_class):
             #Close file
             writing_file(filePath, "</page></CDXML>", "a")
 
+            QMessageBox.information(self, "Notice", "Finished!", QMessageBox.Ok)
+
             #Open folfer
             os.startfile(Path(filePath).parent)
 
@@ -260,7 +262,7 @@ def make_labels(filename, values, labels, points_Eprofile, font_size, color_inde
         if float(values[i]) < 0:  # make en-dash
             num = str(values[i]).split("-")[1]
             f.write('<s font="3" size="{0}" color="{1}">(</s>'.format(font_size, str(color_index)))
-            f.write('<s font="7" size="{0}" color="{1}">-</s><s font="3" size="{2}" color="0">{3:0.2f})</s></t>\n'.format(font_size,str(color_index),font_size,float(num)))
+            f.write('<s font="7" size="{0}" color="{1}">-</s><s font="3" size="{2}" color="{1}">{3:0.2f})</s></t>\n'.format(font_size,str(color_index),font_size,float(num)))
         else:
             f.write('<s font="3" size="{0}" color="{1}">({2:0.2f})</s></t>\n'.format(font_size, str(color_index), float(values[i])))
     f.close()
