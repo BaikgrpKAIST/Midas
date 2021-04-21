@@ -1,4 +1,7 @@
 # Midas
  Python version of Predictor Toolkits
  
- Please launch dist/MiidasMain.exe.
+ Java version: https://github.com/BaikgrpKAIST/PredictorToolkits
+ 
+ Please exe file in the 'dist' folder.    
+ https://github.com/BaikgrpKAIST/Midas/tree/main/dist
