@@ -322,6 +322,24 @@ def SI_Gaussian(CalcPath, list, coordPath, freqPath):
                 line = outFile.readline()
                 coordinates = coordinates + coord + "\n"
 
+        elif "Standard orientation:" in line:
+            coordinates = ""
+            numatom = 0
+
+            outFile.readline()
+            outFile.readline()
+            outFile.readline()
+            outFile.readline()
+            line = outFile.readline().strip()
+            while not ("----------" in line.strip()):
+                numatom += 1
+                atom = PeriodicTable.getAtom(line.strip().split()[1])
+                coord = "%4s" % atom
+                for i in range(len(line.strip().split()) - 3):
+                    coord = coord + ("%14.6f"% float(line.strip().split()[i+3]))
+                line = outFile.readline()
+                coordinates = coordinates + coord + "\n"
+
     #write files
     freq_txt.write(frequencies+"\n")
     coord_txt.write(coordinates + "\n")
