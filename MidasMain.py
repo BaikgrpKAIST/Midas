@@ -1,7 +1,7 @@
 import math
 import os
 import sys
-import SelectivityCalculator, RedoxCalculator, SIExporter, EProfilePlotter
+import SelectivityCalculator, RedoxCalculator, SIExporter, EProfilePlotter,TDUVplot
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
@@ -32,6 +32,7 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.btnRedox.pressed.connect(self.openRedoxCalculator)
         self.btnSIExporter.pressed.connect(self.openSIExporter)
         self.btnEProfile.pressed.connect(self.openEProfilePlotter)
+        self.btnTDPlot.pressed.connect(self.openTDPlotter)
 
     @pyqtSlot()
     def openSelectivityCalculator(self):
@@ -50,6 +51,9 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.a = EProfilePlotter.EProfilePlotterMainWindow()
         self.a.show()
 
+    def openTDPlotter(self):
+        self.a = TDUVplot.TDUVPlotMainWindow()
+        self.a.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

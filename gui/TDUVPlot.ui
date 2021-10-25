@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>142</height>
+    <width>878</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>330</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -30,8 +30,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>40</y>
+      <x>360</x>
+      <y>330</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -40,22 +40,22 @@
      <string>TD Output:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="txtDataDir">
+   <widget class="QLineEdit" name="txtExpDataDir">
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>10</y>
-      <width>361</width>
+      <y>330</y>
+      <width>171</width>
       <height>20</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="txtOutDir">
+   <widget class="QLineEdit" name="txtTDOutDir">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>40</y>
-      <width>361</width>
+      <x>430</x>
+      <y>330</y>
+      <width>241</width>
       <height>20</height>
      </rect>
     </property>
@@ -63,14 +63,37 @@
    <widget class="QPushButton" name="btnConvert">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>70</y>
+      <x>220</x>
+      <y>400</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Convert</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tblExpData">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>301</width>
+      <height>291</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnReadExpData">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>330</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Read</string>
     </property>
    </widget>
   </widget>

@@ -1,3 +1,4 @@
+import os
 import sys
 
 import pandas as pd
@@ -8,23 +9,74 @@ from PyQt5.QtWidgets import *
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
-form_class = uic.loadUiType("TD-UVPlot.ui")[0]
+form = resource_path(resource_path("gui/TDUVplot.ui"))
+form_class = uic.loadUiType(form)[0]
 
-class MainWindow(QMainWindow, form_class):
+class TDUVPlotMainWindow(QMainWindow, form_class):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
 
+        self.btnReadExpData.pressed.connect(self.ReadExpDataAction)
         self.btnConvert.pressed.connect(self.ConvertAction)
 
     @pyqtSlot()
-    def ConvertAction(self):
-        Exp_data_path = self.txtDataDir.text()
-        TD_out_path = self.txtOutDir.text()
-        #print(Exp_data_path + "\n" + TD_out_path)
-        read_files(Exp_data_path, TD_out_path)
+    def ReadExpDataAction(self):
+        filepath = self.txtExpDataDir.text()
+        if (os.path.isfile(filepath)):
+            self.uvdata = pd.read_csv(filepath)
+            self.df_UV = pd.DataFrame(self.uvdata)
+            self.df_UV.head()
 
+            self.df_rows = self.df_UV.shape[0]
+            self.df_cols = self.df_UV.shape[1]
+            self.tblExpData.setRowCount(self.df_rows)
+            self.tblExpData.setColumnCount(self.df_cols)
+            for i in range(self.df_rows):
+                for j in range(self.df_cols):
+                    try:
+                        x = self.df_UV.iloc[i, j]
+                        self.tblExpData.setItem(i, j, QTableWidgetItem(str(x)))
+                    except:
+                        pass
+
+        # Exp_data_path = self.txtDataDir.text()
+        # TD_out_path = self.txtOutDir.text()
+        # print(Exp_data_path + "\n" + TD_out_path)
+        # read_files(Exp_data_path, TD_out_path)
+
+    def ConvertAction(self):
+        self.fig = plt.figure()
+        self.ax1 = self.fig.add_subplot(111)  # .gca()
+
+        self.num_row = self.tblExpData.rowCount()
+        self.num_col = self.tblExpData.columnCount()
+        self.tmp_df = pd.DataFrame(
+            #columns=['Wavelength', 'Absorbance'],
+            #ndex=range(self.num_row)
+        )
+        for i in range(self.num_row):
+            for j in range(self.num_col):
+                try:
+                    self.tmp_df.loc[i,j] = float(self.tblExpData.item(i,j).text())
+                except:
+                    pass
+
+        self.y_uv = self.tmp_df[1]
+        self.x_uv = self.tmp_df[0]
+
+        self.ax1.plot(self.x_uv, self.y_uv, color='r')#, label='Experimental')
+        self.ax1.set_ylabel('Absorbance')
+        self.ax1.legend()
+        # ax1.tick_params(axis='x', labelbottom=False, bottom=False)
+
+        plt.xlabel('Wavelength (nm)')
+        plt.show()
 
 def search_file(f_name, program, units):
     ''' Grabs all the oscillator strengths and excitation energies '''
