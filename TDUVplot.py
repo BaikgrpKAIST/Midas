@@ -23,9 +23,30 @@ class TDUVPlotMainWindow(QMainWindow, form_class):
         self.setupUi(self)
 
         self.btnReadExpData.pressed.connect(self.ReadExpDataAction)
+        self.btnExpDataPath.pressed.connect(self.ReadExpDataPath)
+
+        self.btnTDPath.pressed.connect(self.ReadTDPath)
+
         self.btnConvert.pressed.connect(self.ConvertAction)
 
     @pyqtSlot()
+    def ReadExpDataPath(self):
+        try:
+            fname = QFileDialog.getOpenFileName(self, "Select Exp. Data File.")
+            self.txtExpDataDir.setText(fname[0])
+            self.ReadExpDataAction()
+
+        except:
+            pass
+
+    def ReadTDPath(self):
+        try:
+            fname = QFileDialog.getOpenFileName(self, "Select TDDFT output File.")
+            self.txtTDDir.setText(fname[0])
+
+        except:
+            pass
+
     def ReadExpDataAction(self):
         filepath = self.txtExpDataDir.text()
         if (os.path.isfile(filepath)):
@@ -45,14 +66,8 @@ class TDUVPlotMainWindow(QMainWindow, form_class):
                     except:
                         pass
 
-        # Exp_data_path = self.txtDataDir.text()
-        # TD_out_path = self.txtOutDir.text()
-        # print(Exp_data_path + "\n" + TD_out_path)
-        # read_files(Exp_data_path, TD_out_path)
 
     def ConvertAction(self):
-        self.fig = plt.figure()
-        self.ax1 = self.fig.add_subplot(111)  # .gca()
 
         self.num_row = self.tblExpData.rowCount()
         self.num_col = self.tblExpData.columnCount()
@@ -67,16 +82,16 @@ class TDUVPlotMainWindow(QMainWindow, form_class):
                 except:
                     pass
 
-        self.y_uv = self.tmp_df[1]
-        self.x_uv = self.tmp_df[0]
+        self.outpath = self.txtTDDir.text()
 
-        self.ax1.plot(self.x_uv, self.y_uv, color='r')#, label='Experimental')
-        self.ax1.set_ylabel('Absorbance')
-        self.ax1.legend()
-        # ax1.tick_params(axis='x', labelbottom=False, bottom=False)
+        self.broaden, self.sigma, self.units = 'lorentz', 20, 'nm'
+        self.osc, self.poles = combine_calculations(self.outpath, 'QChem', self.units)
+        self.Abs, self.freqs = broaden_spectrum(self.osc, self.poles, self.broaden, self.sigma)
 
-        plt.xlabel('Wavelength (nm)')
+        plot_spectrum(self.Abs, self.freqs, self.osc, self.poles, self.units, self.tmp_df)
         plt.show()
+
+
 
 def search_file(f_name, program, units):
     ''' Grabs all the oscillator strengths and excitation energies '''
@@ -190,8 +205,8 @@ def plot_spectrum(Abs, freq, osc, poles, units, df):
     ax1 = fig.add_subplot(211)  # .gca()
     ax2 = fig.add_subplot(212)
 
-    y_uv = df['HJ10-051']
-    x_uv = df["Wavelength"]
+    y_uv = df[1]
+    x_uv = df[0]
     ax1.plot(x_uv, y_uv, color='r', label='Experimental')
     ax1.set_ylabel('Absorbance')
     ax1.legend()
