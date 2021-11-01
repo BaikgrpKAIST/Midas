@@ -271,12 +271,11 @@ class GaussianEditorMainWindow(QMainWindow, form_class):
                 for self.atom in self.ECPAtoms:
                     self.atom_list = self.atom_list + self.atom + " "
                 self.txtInputPreview.appendPlainText(self.atom_list + "0")
-                self.txtInputPreview.appendPlainText(self.txtBasisSetMain.text())
+                self.txtInputPreview.appendPlainText(self.txtBasisSetSub.text())
                 self.txtInputPreview.appendPlainText("****\n")
 
                 self.txtInputPreview.appendPlainText(self.atom_list + "0")
-                self.txtInputPreview.appendPlainText(self.txtBasisSetMain.text())
-                self.txtInputPreview.appendPlainText("****")
+                self.txtInputPreview.appendPlainText(self.txtBasisSetSub.text())
 
         except:
             pass
