@@ -161,6 +161,9 @@ def search_file(f_name, program, units):
 
     searchfile.close()
 
+    osc.append(0)
+    poles.append(700)
+
     return osc, poles
 
 def combine_calculations(f_names, program, units):
@@ -280,12 +283,6 @@ def read_files(uvpath, outpath):
     plot_spectrum_TD(Abs, freqs, osc, poles, units)
 
     plt.show()
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    w = MainWindow()
-    w.show()
-    app.exec()
 
 
 

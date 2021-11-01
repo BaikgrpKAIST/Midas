@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+#command: pyinstaller -F MidasMain.spec
 
 block_cipher = None
 
@@ -25,7 +26,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='MidasMain',
+          name='Midas',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

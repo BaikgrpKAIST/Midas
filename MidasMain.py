@@ -1,6 +1,8 @@
 import math
 import os
 import sys
+
+import GaussianEditor
 import SelectivityCalculator, RedoxCalculator, SIExporter, EProfilePlotter,TDUVplot
 
 from PyQt5 import uic
@@ -22,6 +24,7 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.statusBar.showMessage("Copyright(C) 2021. Baikgroup @ KAIST. All rights reserved.")
 
         #Setup icons
+        self.setWindowIcon(QIcon('gui\icons\Main.png'))
         self.btnSelectivity.setIcon(QIcon(resource_path("gui\icons\Selectivity.png")))
         self.btnRedox.setIcon(QIcon(resource_path("gui\icons\RedoxPotential.png")))
         self.btnSIExporter.setIcon(QIcon(resource_path("gui\icons\SI_Convertor.png")))
@@ -32,7 +35,8 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.btnRedox.pressed.connect(self.openRedoxCalculator)
         self.btnSIExporter.pressed.connect(self.openSIExporter)
         self.btnEProfile.pressed.connect(self.openEProfilePlotter)
-        self.btnTDPlot.pressed.connect(self.openTDPlotter)
+        #self.btnTDPlot.pressed.connect(self.openTDPlotter)
+        self.btnG09.pressed.connect(self.openG09Editor)
 
     @pyqtSlot()
     def openSelectivityCalculator(self):
@@ -54,6 +58,11 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
     def openTDPlotter(self):
         self.a = TDUVplot.TDUVPlotMainWindow()
         self.a.show()
+
+    def openG09Editor(self):
+        self.a = GaussianEditor.GaussianEditorMainWindow()
+        self.a.show()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
