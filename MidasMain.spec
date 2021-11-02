@@ -1,6 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 #command: pyinstaller -F MidasMain.spec
+#to reduce file size: pyinstaller -F -w --exclude pandas, --exclude numpy MidasMain.spec
+#icon: pyinstaller -F --onefile --icon=./gui/icons/Main.ico MidasMain.spec
 
 block_cipher = None
 

@@ -1,3 +1,4 @@
+"""
 import os
 import sys
 
@@ -10,7 +11,6 @@ from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 
 def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
@@ -259,10 +259,6 @@ def get_program(outpath):
 
 def read_files(uvpath, outpath):
     # designate TD-DFT calculation and UV-Vis spectrum
-    """
-    outpath = 'TDDFT-output/HJ_tutorial_012_orca.out'
-    uvdata = pd.read_csv("UV-master.csv")
-    """
     #uvdata = pd.read_csv(uvpath)
     #df = pd.DataFrame(uvdata)
 
@@ -284,5 +280,4 @@ def read_files(uvpath, outpath):
 
     plt.show()
 
-
-
+"""
