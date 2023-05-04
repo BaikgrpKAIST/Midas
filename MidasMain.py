@@ -2,8 +2,7 @@ import math
 import os
 import sys
 
-import GaussianEditor
-import SelectivityCalculator, RedoxCalculator, SIExporter, EProfilePlotter
+import GaussianEditor, SelectivityCalculator, RedoxCalculator, SIExporter, EProfilePlotter, TDUVplot
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
@@ -35,7 +34,7 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.btnRedox.pressed.connect(self.openRedoxCalculator)
         self.btnSIExporter.pressed.connect(self.openSIExporter)
         self.btnEProfile.pressed.connect(self.openEProfilePlotter)
-        #self.btnTDPlot.pressed.connect(self.openTDPlotter)
+        self.btnTDPlot.pressed.connect(self.openTDPlotter)
         self.btnG09.pressed.connect(self.openG09Editor)
 
     @pyqtSlot()
@@ -56,9 +55,9 @@ class MidasMainWindow(QMainWindow, form_MidasMain):
         self.a.show()
 
 
-    #def openTDPlotter(self):
-    #    self.a = TDUVplot.TDUVPlotMainWindow()
-    #    self.a.show()
+    def openTDPlotter(self):
+        self.a = TDUVplot.TDUVPlotMainWindow()
+        self.a.show()
 
 
     def openG09Editor(self):

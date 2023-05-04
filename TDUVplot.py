@@ -1,4 +1,3 @@
-"""
 import os
 import sys
 
@@ -84,7 +83,7 @@ class TDUVPlotMainWindow(QMainWindow, form_class):
 
         self.outpath = self.txtTDDir.text()
 
-        self.broaden, self.sigma, self.units = 'lorentz', 20, 'nm'
+        self.broaden, self.sigma, self.units = 'lorentz', 40, 'nm'
         self.osc, self.poles = combine_calculations(self.outpath, 'QChem', self.units)
         self.Abs, self.freqs = broaden_spectrum(self.osc, self.poles, self.broaden, self.sigma)
 
@@ -214,14 +213,14 @@ def plot_spectrum(Abs, freq, osc, poles, units, df):
     ax1.set_ylabel('Absorbance')
     ax1.legend()
     # ax1.tick_params(axis='x', labelbottom=False, bottom=False)
-    ax1.set_xlim(200, 700)
+    ax1.set_xlim(250, 600)
 
     ax2.plot(freq, Abs, color='b', label="Computed")
     ax2.vlines(poles, [0], osc, label="Computed transitions")
     # ax2.invert_xaxis()  # sometimes helpful to invert axis if using nm
     ax2.set_ylabel('Relative Stength')
     ax2.legend()
-    ax2.set_xlim(200, 700)
+    ax2.set_xlim(250, 600)
 
     plt.xlabel('Wavelength (%s)' % units)
 
@@ -279,5 +278,3 @@ def read_files(uvpath, outpath):
     plot_spectrum_TD(Abs, freqs, osc, poles, units)
 
     plt.show()
-
-"""

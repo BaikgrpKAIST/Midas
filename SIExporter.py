@@ -276,7 +276,7 @@ def SI_Gaussian(CalcPath, list, coordPath, freqPath):
         outFile = open(logpath, 'r')
 
     label = list.split()[1]
-    coord_txt = open(coordPath, 'a')
+    coord_txt = open(coordPath, 'a', encoding="utf-8")
     coord_xyz = open(coordPath.replace('.txt', '.xyz'), 'a')
     freq_txt = open(freqPath, 'a')
 
@@ -286,7 +286,9 @@ def SI_Gaussian(CalcPath, list, coordPath, freqPath):
     frequencies = ""
     coordinates = ""
     numatom = 0
+    charge_spin = ""
     freq_count = 0
+    freq_imaginary = ""
 
     while True:
         line = outFile.readline()
@@ -297,6 +299,10 @@ def SI_Gaussian(CalcPath, list, coordPath, freqPath):
             freq_count += 1
             freq = ""
             line = line.strip()
+
+            if float(line.split()[2]) < 0:
+                freq_imaginary = str(format(float(line.split()[2]),".2f"))
+
             for i in range(len(line.split()) - 2):
                 freq = freq + "%8s" % str(format(float(line.split()[i+2]),".2f"))
 
@@ -339,13 +345,24 @@ def SI_Gaussian(CalcPath, list, coordPath, freqPath):
                     coord = coord + ("%14.6f"% float(line.strip().split()[i+3]))
                 line = outFile.readline()
                 coordinates = coordinates + coord + "\n"
+        elif "Charge = " in line:
+            charge_spin = line.strip()
 
     #write files
     freq_txt.write(frequencies+"\n")
+
+    coord_txt.write(charge_spin+"\n")
+    if "-" in freq_imaginary:
+        coord_txt.write("Imaginary frequency: "+freq_imaginary+" cm\u207B\u00B9\n")
+    else:
+        pass
+
+    coord_txt.write("Cartesian coordinates:\nATOM        X               Y               Z\n")
     coord_txt.write(coordinates + "\n")
-    coord_xyz.write(str(numatom)+"\n")
-    coord_xyz.write(label+"\n")
-    coord_xyz.write(coordinates)
+
+    coord_xyz.write(label+" ("+charge_spin+")\n")
+    coord_xyz.write(coordinates+"\n")
+
 
     coord_txt.close()
     coord_xyz.close()
