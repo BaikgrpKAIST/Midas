@@ -83,8 +83,8 @@ class TDUVPlotMainWindow(QMainWindow, form_class):
 
         self.outpath = self.txtTDDir.text()
 
-        self.broaden, self.sigma, self.units = 'lorentz', 40, 'nm'
-        self.osc, self.poles = combine_calculations(self.outpath, 'QChem', self.units)
+        self.broaden, self.sigma, self.units = 'lorentz', 60, 'nm'
+        self.osc, self.poles = combine_calculations(self.outpath, 'Gaussian', self.units)
         self.Abs, self.freqs = broaden_spectrum(self.osc, self.poles, self.broaden, self.sigma)
 
         plot_spectrum(self.Abs, self.freqs, self.osc, self.poles, self.units, self.tmp_df)
@@ -129,7 +129,7 @@ def search_file(f_name, program, units):
 
     if program == 'Gaussian':
         for line in searchfile:
-            if ' Excited State   ' in line:
+            if ' Excited State  ' in line:
                 contents = line.split()
                 osc.append(float(contents[8].split("=")[1]))
 
@@ -246,7 +246,7 @@ def get_program(outpath):
         if 'Q-Chem version' in line:
             program = "QChem"
             break
-        if 'Entering Gaussian System,' in line:
+        if 'Entering Gaussian System' in line:
             program = "Gaussian"
             break
         if 'O   R   C   A' in line:
